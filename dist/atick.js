@@ -1,7 +1,7 @@
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define(factory) :
-  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.atrans = factory());
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.atick = factory());
 }(this, (function () { 'use strict';
 
   const easingMap = {
@@ -231,7 +231,6 @@
       duration,
       onTick,
       onComplete,
-      onReverse,
       delay = 0,
       reverse = false,
       easing = "linear",
@@ -247,7 +246,7 @@
       const _delta = delta - delay;
       const p = Math.min(_delta, duration) / duration;
       const val = isRe ? 1 - p : p;
-      onTick(easingMap[easing] ? easingMap[easing](val) : val);
+      onTick(easingMap[easing] ? easingMap[easing](val) : val, val);
       // console.log(val, _delta, duration);
       if (_delta >= duration) {
         if (yoyo) {
@@ -263,6 +262,11 @@
     };
 
     requestAnimationFrame(run);
+    return {
+      toggle(val) {
+        console.log(val);
+      },
+    };
   }
 
   function createEngine(actions) {
@@ -280,9 +284,16 @@
             return;
           }
           const current = actions[i];
+          const tick = current.update();
           engine({
-            onTick: current.update(),
-            onComplete: run,
+            onTick: (p, p1) => {
+              tick(p);
+              current.onTick && current.onTick(p1);
+            },
+            onComplete: () => {
+              run();
+              current.onComplete && current.onComplete();
+            },
             duration: current.duration || 1000,
             delay: current.delay || 0,
             reverse: current.reverse,
@@ -337,7 +348,7 @@
     return typeof target === "string" ? document.querySelector(target) : target;
   }
 
-  function Transer(target) {
+  function Ticker(target) {
     this._actions = [];
     this._target = parseTarget(target);
     this._matrix = createMatrix((mtx) => {
@@ -345,7 +356,7 @@
     });
     this._engine = createEngine(this._actions);
   }
-  Transer.prototype.action = function (config = {}) {
+  Ticker.prototype.action = function (config = {}) {
     const { x, y, scaleX, scaleY, rotation, ...rest } = config;
     this._actions.push({
       ...rest,
@@ -365,12 +376,16 @@
         };
       },
     });
-    this._engine();
+    this._ctrl = this._engine();
+    return this;
+  };
+  Ticker.prototype.toggle = function () {
+    this._ctrl && this._ctrl.toggle(arguments[0]);
     return this;
   };
 
   function createTranser() {
-    return new Transer(arguments[0]);
+    return new Ticker(arguments[0]);
   }
 
   return createTranser;

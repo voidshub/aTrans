@@ -7,7 +7,7 @@ function parseTarget(target) {
   return typeof target === "string" ? document.querySelector(target) : target;
 }
 
-export default function Transer(target) {
+export default function Ticker(target) {
   this._actions = [];
   this._target = parseTarget(target);
   this._matrix = createMatrix((mtx) => {
@@ -15,7 +15,7 @@ export default function Transer(target) {
   });
   this._engine = createEngine(this._actions);
 }
-Transer.prototype.action = function (config = {}) {
+Ticker.prototype.action = function (config = {}) {
   const { x, y, scaleX, scaleY, rotation, ...rest } = config;
   this._actions.push({
     ...rest,
@@ -35,6 +35,10 @@ Transer.prototype.action = function (config = {}) {
       };
     },
   });
-  this._engine();
+  this._ctrl = this._engine();
+  return this;
+};
+Ticker.prototype.toggle = function () {
+  this._ctrl && this._ctrl.toggle(arguments[0]);
   return this;
 };

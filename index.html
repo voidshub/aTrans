@@ -15,19 +15,31 @@
   </head>
   <body>
     <button onclick="plays()">play</button>
+    <button onclick="toggle()">toggle</button>
     <br />
     <div class="box" id="box"></div>
-    <script src="dist/atrans.js"></script>
+    <script src="dist/atick.js"></script>
     <script>
+      let mo;
+      function toggle() {
+        mo.toggle();
+      }
       function plays() {
-        atrans("#box").action({
+        mo = atick("#box").action({
           x: 100,
           y: 100,
           scaleX: 2,
           scaleY: 2,
-          easing: "easeOutBounce",
+          // duration: 5000,
+          easing: "spring",
           // yoyo: true,
           // delay: 1000,
+          onTick(progress) {
+            console.log("update", progress);
+          },
+          onComplete() {
+            console.log("done");
+          },
         });
         // .action({
         //   delay: 1000,

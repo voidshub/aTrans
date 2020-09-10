@@ -1,10 +1,10 @@
 export default {
     input: 'src/index.js',
     output: {
-        file: 'dist/atrans.js',
+        file: 'dist/atick.js',
         format: 'umd',
         path: 'dist',
-        name: 'atrans',
+        name: 'atick',
     },
     plugins: [
         

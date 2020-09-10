@@ -4,12 +4,12 @@ export default function engine(opt) {
     duration,
     onTick,
     onComplete,
-    onReverse,
     delay = 0,
     reverse = false,
     easing = "linear",
     yoyo = false,
   } = opt;
+  let paused = false;
   let start = Date.now();
   let isRe = reverse;
   const run = () => {
@@ -20,7 +20,7 @@ export default function engine(opt) {
     const _delta = delta - delay;
     const p = Math.min(_delta, duration) / duration;
     const val = isRe ? 1 - p : p;
-    onTick(easingMap[easing] ? easingMap[easing](val) : val);
+    onTick(easingMap[easing] ? easingMap[easing](val) : val, val);
     // console.log(val, _delta, duration);
     if (_delta >= duration) {
       if (yoyo) {
@@ -36,6 +36,12 @@ export default function engine(opt) {
   };
 
   requestAnimationFrame(run);
+  return {
+    toggle(val) {
+      console.log(val);
+      paused = typeof val === "undefined" ? !paused : !!val;
+    },
+  };
 }
 
 export function createEngine(actions) {
@@ -53,9 +59,16 @@ export function createEngine(actions) {
           return;
         }
         const current = actions[i];
+        const tick = current.update();
         engine({
-          onTick: current.update(),
-          onComplete: run,
+          onTick: (p, p1) => {
+            tick(p);
+            current.onTick && current.onTick(p1);
+          },
+          onComplete: () => {
+            run();
+            current.onComplete && current.onComplete();
+          },
           duration: current.duration || 1000,
           delay: current.delay || 0,
           reverse: current.reverse,
