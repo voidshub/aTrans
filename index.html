@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      .box {
+        display: inline-block;
+        width: 200px;
+        height: 50px;
+        background: #ccc;
+      }
+    </style>
+  </head>
+  <body>
+    <button onclick="plays()">play</button>
+    <br />
+    <div class="box" id="box"></div>
+    <script src="dist/atrans.js"></script>
+    <script>
+      function plays() {
+        atrans("#box").action({
+          x: 100,
+          y: 100,
+          scaleX: 2,
+          scaleY: 2,
+          easing: "easeOutBounce",
+          // yoyo: true,
+          // delay: 1000,
+        });
+        // .action({
+        //   delay: 1000,
+        //   x: 500,
+        //   y: 100,
+        //   scaleX: 0.5,
+        //   reverse: true,
+        // });
+      }
+    </script>
+  </body>
+</html>
